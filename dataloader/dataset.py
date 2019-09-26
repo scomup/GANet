@@ -116,13 +116,15 @@ def test_transform(temp_data, crop_height, crop_width, left_right=False):
 
 def load_data(data_path, current_file):
     A = current_file
-    filename = data_path + 'frames_finalpass/' + A[0: len(A) - 1]
+    filename = data_path  + A[0: len(A) - 1]
     left  =Image.open(filename)
-    filename = data_path + 'frames_finalpass/' + A[0: len(A) - 14] + 'right/' + A[len(A) - 9:len(A) - 1]
+    filename = data_path  + A[0: len(A) - 15] + 'right/' + A[len(A) - 10:len(A) - 1]
     right = Image.open(filename)
-    filename = data_path + 'disparity/' + A[0: len(A) - 4] + 'pfm'
+    filename = data_path + A[0: len(A) - 5] + 'pfm'
+    filename = filename.replace('frames_cleanpass', 'disparity')
     disp_left, height, width = readPFM(filename)
-    filename = data_path + 'disparity/' + A[0: len(A) - 14] + 'right/' + A[len(A) - 9: len(A) - 4] + 'pfm'
+    filename = data_path + A[0: len(A) - 15] + 'right/' + A[len(A) - 10: len(A) - 5] + 'pfm'
+    filename = filename.replace('frames_cleanpass', 'disparity')
     disp_right, height, width = readPFM(filename)
     size = np.shape(left)
     height = size[0]

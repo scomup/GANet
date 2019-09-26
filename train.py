@@ -19,9 +19,9 @@ from dataloader.data import get_training_set, get_test_set
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch GANet Example')
-parser.add_argument('--crop_height', type=int, required=True, help="crop height")
+parser.add_argument('--crop_height', type=int, default=144, help="crop height")
 parser.add_argument('--max_disp', type=int, default=192, help="max disp")
-parser.add_argument('--crop_width', type=int, required=True, help="crop width")
+parser.add_argument('--crop_width', type=int, default=288, help="crop width")
 parser.add_argument('--resume', type=str, default='', help="resume from saved model")
 parser.add_argument('--left_right', type=int, default=0, help="use right view for training. Default=False")
 parser.add_argument('--batchSize', type=int, default=1, help='training batch size')
@@ -34,11 +34,11 @@ parser.add_argument('--seed', type=int, default=123, help='random seed to use. D
 parser.add_argument('--shift', type=int, default=0, help='random shift of left image. Default=0')
 parser.add_argument('--kitti', type=int, default=0, help='kitti dataset? Default=False')
 parser.add_argument('--kitti2015', type=int, default=0, help='kitti 2015? Default=False')
-parser.add_argument('--data_path', type=str, default='/ssd1/zhangfeihu/data/stereo/', help="data root")
+parser.add_argument('--data_path', type=str, default='/home/liu/DP_DATA/STEREO/', help="data root")
 parser.add_argument('--training_list', type=str, default='./lists/sceneflow_train.list', help="training list")
 parser.add_argument('--val_list', type=str, default='./lists/sceneflow_test_select.list', help="validation list")
 parser.add_argument('--save_path', type=str, default='./checkpoint/', help="location to save models")
-parser.add_argument('--model', type=str, default='GANet_deep', help="model to train")
+parser.add_argument('--model', type=str, default='GANet11', help="model to train")
 
 opt = parser.parse_args()
 
@@ -64,6 +64,7 @@ train_set = get_training_set(opt.data_path, opt.training_list, [opt.crop_height,
 test_set = get_test_set(opt.data_path, opt.val_list, [576,960], opt.left_right, opt.kitti, opt.kitti2015)
 training_data_loader = DataLoader(dataset=train_set, num_workers=opt.threads, batch_size=opt.batchSize, shuffle=True, drop_last=True)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=opt.threads, batch_size=opt.testBatchSize, shuffle=False)
+train_set.__getitem__(0)
 
 print('===> Building model')
 model = GANet(opt.max_disp)
@@ -178,6 +179,9 @@ def adjust_learning_rate(optimizer, epoch):
         param_group['lr'] = lr
 
 if __name__ == '__main__':
+    import torch.multiprocessing as mp
+    mp.set_start_method('spawn')
+
     error=100
     for epoch in range(1, opt.nEpochs + 1):
 #        if opt.kitti or opt.kitti2015:
